@@ -792,11 +792,14 @@
       const data = await apiSetDay(state.sessionToken, day);
       state.currentDay = data.currentDay;
       state.lastCompletedDay = data.lastCompletedDay;
-      // Inject a system_event-style marker into the visible conversation.
-      state.messages.push({
-        role: "assistant",
-        content: "[Demo] Switched to Day " + day + ". The next message will use the Day " + day + " prompt."
-      });
+      // Render the AI's canonical opening for the new day as a real assistant
+      // message. The backend has already persisted it to the database.
+      if (data.opening) {
+        state.messages.push({
+          role: "assistant",
+          content: data.opening
+        });
+      }
       state.loading = false;
       render();
     } catch (err) {
