@@ -51,14 +51,14 @@
   }
 
   * { box-sizing: border-box; }
-  html, body {
-    margin: 0; padding: 0;
-    background: var(--bg);
-    color: var(--text);
-    font-family: Georgia, "Times New Roman", serif;
-    height: 100%;
-    overflow: hidden;
-  }
+ html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Georgia, "Times New Roman", serif;
+  min-height: 100%;
+}
   button { font-family: inherit; cursor: pointer; }
 
   /* Demo banner */
@@ -75,12 +75,12 @@
     flex-shrink: 0;
   }
 
-  #app {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    width: 100%;
-  }
+ #app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
+}
   .main-row { display: flex; flex: 1; min-height: 0; }
 
   /* Sidebar */
@@ -461,8 +461,11 @@
   .brand { padding-bottom: 14px; margin-bottom: 14px; }
   .day-list { flex-direction: row; gap: 6px; margin-bottom: 12px; overflow-x: auto; }
   .day-item { flex-shrink: 0; padding: 8px 12px; gap: 8px; }
-  .day-info { display: none; }
-  .day-item .day-num { width: 26px; height: 26px; font-size: 11px; }
+  .day-info { display: flex; flex-direction: column; min-width: 0; }
+.day-title { font-size: 9px; line-height: 1.1; letter-spacing: 0.08em; }
+.day-theme { font-size: 11px; font-weight: 600; font-style: normal; margin-top: 2px; letter-spacing: 0.02em; }
+.day-item .day-num { width: 22px; height: 22px; font-size: 10px; }
+.day-item.active .day-theme { color: var(--gold); }
   .demo-help { display: none; }
   .reset-btn { margin-top: 6px; padding: 8px; }
   .sidebar-footer { padding-top: 12px; margin-top: 12px; }
