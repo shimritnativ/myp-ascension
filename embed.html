@@ -55,25 +55,26 @@
   * { box-sizing: border-box; }
 
   html, body {
-    margin: 0;
-    padding: 0;
-    background: var(--bg);
-    color: var(--text);
-    font-family: Georgia, "Times New Roman", serif;
-    height: 100%;
-    overflow: hidden;
-  }
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Georgia, "Times New Roman", serif;
+  min-height: 100%;
+}
 
   button { font-family: inherit; cursor: pointer; }
 
   /* ============================================================
      Layout
      ============================================================ */
+
   #app {
-    display: flex;
-    height: 100vh;
-    width: 100%;
-  }
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
+}
 
   /* ============================================================
      Sidebar
