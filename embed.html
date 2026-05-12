@@ -5,9 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>The Freedom Intelligence Field</title>
 <style>
-  /* ============================================================
-     Theme tokens. Swap by setting [data-theme="light"] on <html>.
-     ============================================================ */
   html[data-theme="dark"] {
     --bg: #080808;
     --panel: #0f0f0f;
@@ -24,7 +21,6 @@
     --user-msg-border: rgba(201, 168, 76, 0.22);
     --assistant-msg-bg: rgba(240, 234, 214, 0.03);
     --assistant-msg-border: rgba(240, 234, 214, 0.07);
-    --input-bg: transparent;
     --border: rgba(201, 168, 76, 0.07);
     --shadow: 0 0 80px rgba(201, 168, 76, 0.03), 0 24px 48px rgba(0,0,0,0.6);
     color-scheme: dark;
@@ -46,7 +42,6 @@
     --user-msg-border: rgba(154, 110, 16, 0.25);
     --assistant-msg-bg: #FFFFFF;
     --assistant-msg-border: rgba(26, 22, 18, 0.08);
-    --input-bg: transparent;
     --border: rgba(26, 22, 18, 0.08);
     --shadow: 0 6px 24px rgba(26, 22, 18, 0.06), 0 1px 4px rgba(26, 22, 18, 0.04);
     color-scheme: light;
@@ -55,30 +50,27 @@
   * { box-sizing: border-box; }
 
   html, body {
-  margin: 0;
-  padding: 0;
-  background: var(--bg);
-  color: var(--text);
-  font-family: Georgia, "Times New Roman", serif;
-  min-height: 100%;
-}
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: Georgia, "Times New Roman", serif;
+    min-height: 100%;
+  }
 
   button { font-family: inherit; cursor: pointer; }
 
   /* ============================================================
-     Layout
+     Layout. Desktop = row. Mobile = column (see media query).
      ============================================================ */
-
   #app {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  width: 100%;
-}
+    display: flex;
+    flex-direction: row;
+    min-height: 100vh;
+    width: 100%;
+  }
 
-  /* ============================================================
-     Sidebar
-     ============================================================ */
+  /* Sidebar */
   .sidebar {
     width: 280px;
     flex-shrink: 0;
@@ -193,10 +185,6 @@
     font-style: italic;
     margin-top: 2px;
   }
-  .day-check {
-    font-size: 13px;
-    color: var(--gold);
-  }
 
   .time-block {
     margin-top: auto;
@@ -261,9 +249,7 @@
     color: var(--gold);
   }
 
-  /* ============================================================
-     Main
-     ============================================================ */
+  /* Main */
   .main {
     flex: 1;
     display: flex;
@@ -359,7 +345,6 @@
     font-family: Georgia, "Times New Roman", serif;
   }
 
-  /* Typing */
   .typing {
     display: flex;
     gap: 5px;
@@ -380,7 +365,6 @@
   .typing .dot:nth-child(2) { animation-delay: 0.2s; }
   .typing .dot:nth-child(3) { animation-delay: 0.4s; }
 
-  /* Input */
   .composer-wrap {
     border-top: 1px solid var(--border);
     padding: 16px 28px 20px;
@@ -447,9 +431,7 @@
     letter-spacing: 0.02em;
   }
 
-  /* ============================================================
-     Entry screen
-     ============================================================ */
+  /* Entry */
   .entry-screen {
     flex: 1;
     display: flex;
@@ -487,28 +469,6 @@
     color: var(--text-dim);
     line-height: 1.8;
     margin: 0 auto 32px;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  }
-  .entry-days {
-    display: flex; gap: 8px; justify-content: center; margin-bottom: 34px;
-  }
-  .entry-day {
-    padding: 9px 14px;
-    border: 1px solid var(--gold-line);
-    border-radius: 8px;
-  }
-  .entry-day-num {
-    font-size: 9px;
-    color: var(--gold);
-    letter-spacing: 0.15em;
-    font-weight: 700;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  }
-  .entry-day-theme {
-    font-size: 10px;
-    color: var(--text-dim);
-    margin-top: 3px;
-    letter-spacing: 0.1em;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   }
   .entry-input {
@@ -553,9 +513,7 @@
     text-align: left;
   }
 
-  /* ============================================================
-     Expired
-     ============================================================ */
+  /* Expired */
   .expired-screen {
     flex: 1;
     display: flex;
@@ -614,9 +572,6 @@
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   }
 
-  /* ============================================================
-     Animations
-     ============================================================ */
   @keyframes bounce {
     0%, 60%, 100% { transform: translateY(0); }
     30% { transform: translateY(-6px); }
@@ -627,7 +582,7 @@
   }
 
   /* ============================================================
-     Mobile
+     Tablet
      ============================================================ */
   @media (max-width: 720px) {
     .sidebar { width: 220px; padding: 16px 12px; }
@@ -636,27 +591,34 @@
     .messages, .composer { padding-left: 16px; padding-right: 16px; }
     .composer-wrap { padding: 12px 16px 16px; }
   }
+
+  /* ============================================================
+     Mobile — stack vertically. EVERYTHING in this block is
+     scoped to phones only.
+     ============================================================ */
   @media (max-width: 560px) {
-  .main-row { flex-direction: column; }
-  .sidebar {
-    width: 100%;
-    max-height: none;
-    border-right: none;
-    border-bottom: 1px solid var(--border);
-    padding: 14px 16px;
-    flex-shrink: 0;
-  }
-  .brand { padding-bottom: 14px; margin-bottom: 14px; }
-  .day-list { flex-direction: row; gap: 6px; margin-bottom: 12px; overflow-x: auto; }
-  .day-title { font-size: 9px; line-height: 1.1; letter-spacing: 0.08em; }
-.day-theme { font-size: 11px; font-weight: 600; font-style: normal; margin-top: 2px; letter-spacing: 0.02em; }
-.day-item .day-num { width: 22px; height: 22px; font-size: 10px; }
-.day-item.active .day-theme { color: var(--gold); }
-  .day-item .day-num { width: 26px; height: 26px; font-size: 11px; }
-  .demo-help { display: none; }
-  .reset-btn { margin-top: 6px; padding: 8px; }
-  .sidebar-footer { padding-top: 12px; margin-top: 12px; }
-}
+    #app { flex-direction: column; }
+    .sidebar {
+      width: 100%;
+      max-height: none;
+      border-right: none;
+      border-bottom: 1px solid var(--border);
+      padding: 14px 16px;
+      flex-shrink: 0;
+    }
+    .brand { padding-bottom: 12px; margin-bottom: 12px; }
+    .day-list { flex-direction: row; gap: 6px; margin-bottom: 12px; overflow-x: auto; }
+    .day-item { flex-shrink: 0; padding: 8px 12px; gap: 8px; }
+    .day-info { display: flex; flex-direction: column; min-width: 0; }
+    .day-title { font-size: 9px; line-height: 1.1; letter-spacing: 0.08em; }
+    .day-theme { font-size: 11px; font-weight: 600; font-style: normal; margin-top: 2px; letter-spacing: 0.02em; }
+    .day-item .day-num { width: 22px; height: 22px; font-size: 10px; }
+    .day-item.active .day-theme { color: var(--gold); }
+    .time-block { margin-top: 10px; padding: 10px 14px; }
+    .time-label { font-size: 9px; }
+    .time-value { font-size: 18px; margin-top: 2px; }
+    .time-sub { font-size: 10px; margin-top: 2px; }
+    .sidebar-footer { padding-top: 12px; margin-top: 12px; }
   }
 </style>
 </head>
@@ -667,7 +629,6 @@
 (function () {
   "use strict";
 
-  // ===== Config =====
   const API_BASE = "https://myp-ascension.vercel.app/api";
   const STORAGE_KEY = "tfif_session_v1";
   const THEME_KEY = "tfif_theme_v1";
@@ -682,7 +643,6 @@
     "What is the one move you will take in the next 24 hours?"
   ];
 
-  // ===== State =====
   const state = {
     sessionToken: null,
     currentDay: 1,
@@ -695,29 +655,16 @@
     view: "entry"
   };
 
-  // ===== Persistence =====
-  function loadToken() {
-    try { return localStorage.getItem(STORAGE_KEY); } catch (e) { return null; }
-  }
-  function saveToken(t) {
-    try { localStorage.setItem(STORAGE_KEY, t); } catch (e) {}
-  }
-  function clearToken() {
-    try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
-  }
-  function loadTheme() {
-    try { return localStorage.getItem(THEME_KEY) || "dark"; } catch (e) { return "dark"; }
-  }
-  function saveTheme(t) {
-    try { localStorage.setItem(THEME_KEY, t); } catch (e) {}
-  }
-
+  function loadToken() { try { return localStorage.getItem(STORAGE_KEY); } catch (e) { return null; } }
+  function saveToken(t) { try { localStorage.setItem(STORAGE_KEY, t); } catch (e) {} }
+  function clearToken() { try { localStorage.removeItem(STORAGE_KEY); } catch (e) {} }
+  function loadTheme() { try { return localStorage.getItem(THEME_KEY) || "dark"; } catch (e) { return "dark"; } }
+  function saveTheme(t) { try { localStorage.setItem(THEME_KEY, t); } catch (e) {} }
   function applyTheme(theme) {
     document.documentElement.setAttribute("data-theme", theme);
     saveTheme(theme);
   }
 
-  // ===== Anonymous identity =====
   function generateAnonId() {
     return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
       const r = Math.random() * 16 | 0;
@@ -733,12 +680,9 @@
         localStorage.setItem("tfif_anon_id", id);
       }
       return id;
-    } catch (e) {
-      return generateAnonId();
-    }
+    } catch (e) { return generateAnonId(); }
   }
 
-  // ===== API =====
   async function apiStart(email, displayName) {
     const res = await fetch(API_BASE + "/start", {
       method: "POST",
@@ -762,10 +706,7 @@
   async function apiChat(token, message) {
     const res = await fetch(API_BASE + "/chat", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-session-token": token
-      },
+      headers: { "Content-Type": "application/json", "x-session-token": token },
       body: JSON.stringify({ message })
     });
     if (res.status === 410) return { expired: true };
@@ -774,22 +715,14 @@
     return data;
   }
 
-  // ===== Utilities =====
   function escapeHtml(str) {
-    return String(str)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;");
+    return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   }
   function formatTime(ms) {
     if (!ms || ms <= 0) return { h: 0, m: 0 };
-    return {
-      h: Math.floor(ms / 3600000),
-      m: Math.floor((ms % 3600000) / 60000)
-    };
+    return { h: Math.floor(ms / 3600000), m: Math.floor((ms % 3600000) / 60000) };
   }
 
-  // ===== Renderers =====
   function renderSidebar() {
     const t = formatTime(state.timeRemainingMs || 0);
     const currentTheme = document.documentElement.getAttribute("data-theme") || "dark";
@@ -803,7 +736,6 @@
             <div class="brand-text-2">Freedom Intelligence Field</div>
           </div>
         </div>
-
         <div class="sidebar-label">Your 72-Hour Reset</div>
         <div class="day-list">
           ${DAY_META.map((d, i) => {
@@ -823,7 +755,6 @@
             `;
           }).join("")}
         </div>
-
         ${state.sessionToken && state.timeRemainingMs > 0 ? `
           <div class="time-block">
             <div class="time-label">Time Remaining</div>
@@ -831,7 +762,6 @@
             <div class="time-sub">until the reset closes</div>
           </div>
         ` : `<div style="flex:1"></div>`}
-
         <div class="sidebar-footer">
           <div class="footer-text">v1.0</div>
           <button class="theme-toggle" id="theme-toggle" title="Toggle theme" aria-label="Toggle theme">${themeIcon}</button>
@@ -857,10 +787,10 @@
             <div class="entry-card">
               <div class="entry-label">The Freedom Intelligence Field</div>
               <div class="entry-title">Welcome to Day 1: State Reset</div>
-              <div class="entry-sub" style="margin-bottom: 28px; text-align: left; max-width: none;">Today we are not solving everything. We are locating what is currently active, what has been directing you, and how to return to yourself.</div>
+              <div class="entry-sub" style="margin-bottom: 28px; text-align: left;">Today we are not solving everything. We are locating what is currently active, what has been directing you, and how to return to yourself.</div>
               <form id="entry-form">
                 <input class="entry-input" id="name-input" type="text" placeholder="First name (optional)" autocomplete="given-name" />
-                <textarea class="entry-input" id="opening-input" rows="4" placeholder="Start with one sentence. What is happening right now?" required style="font-family: Georgia, 'Times New Roman', serif; resize: vertical; line-height: 1.6;"></textarea>
+                <textarea class="entry-input" id="opening-input" rows="4" placeholder="Start with one sentence. What is happening right now?" required style="font-family: Georgia, 'Times New Roman', serif; line-height: 1.6;"></textarea>
                 ${state.error ? `<div class="error-text">${escapeHtml(state.error)}</div>` : ""}
                 <button class="btn-primary" type="submit">Begin Day 1</button>
                 <div class="entry-note">Your conversation is private and persists across the 72 hours.</div>
@@ -870,9 +800,8 @@
         </main>
       `;
       document.getElementById("entry-form").addEventListener("submit", onStartSubmit);
-      setTimeout(() => document.getElementById("email-input").focus(), 50);
-    }
-    else if (state.view === "chat") {
+      setTimeout(() => document.getElementById("name-input").focus(), 50);
+    } else if (state.view === "chat") {
       app.innerHTML = `
         ${renderSidebar()}
         <main class="main">
@@ -902,8 +831,7 @@
       document.getElementById("input").addEventListener("keydown", onInputKeyDown);
       document.getElementById("send-btn").addEventListener("click", onSendClick);
       setTimeout(() => document.getElementById("input").focus(), 50);
-    }
-    else if (state.view === "expired") {
+    } else if (state.view === "expired") {
       app.innerHTML = `
         ${renderSidebar()}
         <main class="main">
@@ -931,7 +859,6 @@
       `;
     }
 
-    // Wire up theme toggle (present in every view).
     const themeBtn = document.getElementById("theme-toggle");
     if (themeBtn) themeBtn.addEventListener("click", onThemeToggle);
   }
@@ -956,12 +883,10 @@
     if (wrapper) wrapper.scrollTop = wrapper.scrollHeight;
   }
 
-  // ===== Handlers =====
   function onThemeToggle() {
     const current = document.documentElement.getAttribute("data-theme") || "dark";
     const next = current === "dark" ? "light" : "dark";
     applyTheme(next);
-    // Update just the icon without a full re-render.
     const btn = document.getElementById("theme-toggle");
     if (btn) btn.textContent = next === "dark" ? "☀" : "☾";
   }
@@ -972,29 +897,19 @@
     const opening = (document.getElementById("opening-input").value || "").trim();
     if (!opening) return;
     state.error = null;
-
     try {
-      // Generate or reuse an anonymous ID. Maps to a synthetic email the
-      // backend accepts without code changes. When Kajabi member identity
-      // is wired up later, we'll swap this for the real member ID.
       const anonId = getOrCreateAnonId();
       const syntheticEmail = "anon-" + anonId + "@tfif.local";
-
       const data = await apiStart(syntheticEmail, name);
       state.sessionToken = data.sessionToken;
       saveToken(data.sessionToken);
       state.currentDay = data.currentDay || 1;
       state.tier = data.tier;
       state.timeRemainingMs = data.timeRemainingMs;
-
-      // Land directly into chat with the participant's opening sentence
-      // as their first message. The AI's first reply will be Day 1's
-      // reflection on what they wrote.
       state.view = "chat";
       state.messages = [{ role: "user", content: opening }];
       state.loading = true;
       render();
-
       const chatData = await apiChat(state.sessionToken, opening);
       if (chatData.expired) {
         state.view = "expired";
@@ -1035,14 +950,12 @@
     if (!inputEl) return;
     const text = inputEl.value.trim();
     if (!text || state.loading) return;
-
     state.messages.push({ role: "user", content: text });
     inputEl.value = "";
     inputEl.style.height = "auto";
     state.loading = true;
     document.getElementById("send-btn").classList.remove("active");
     renderMessages();
-
     try {
       const data = await apiChat(state.sessionToken, text);
       if (data.expired) {
@@ -1054,13 +967,9 @@
       state.currentDay = data.currentDay;
       state.timeRemainingMs = data.timeRemainingMs;
       state.loading = false;
-      // Full re-render so sidebar (time, day) updates too.
       render();
     } catch (err) {
-      state.messages.push({
-        role: "assistant",
-        content: "Something went wrong. Try again in a moment."
-      });
+      state.messages.push({ role: "assistant", content: "Something went wrong. Try again in a moment." });
       state.loading = false;
       renderMessages();
     }
@@ -1082,7 +991,6 @@
       state.view = "chat";
       render();
     } catch (err) {
-      // Bad token or other error: reset to entry.
       clearToken();
       state.sessionToken = null;
       state.error = "Session expired. Please start again.";
@@ -1091,10 +999,8 @@
     }
   }
 
-  // ===== Init =====
   function init() {
     applyTheme(loadTheme());
-
     const existing = loadToken();
     if (existing) {
       state.sessionToken = existing;
@@ -1103,13 +1009,10 @@
       state.view = "entry";
       render();
     }
-
-    // Tick time remaining every minute.
     setInterval(() => {
       if (state.timeRemainingMs && state.timeRemainingMs > 0) {
         state.timeRemainingMs = Math.max(0, state.timeRemainingMs - 60000);
         if (state.view === "chat") {
-          // Update sidebar time-block in-place.
           const tb = document.querySelector(".time-value");
           if (tb) {
             const t = formatTime(state.timeRemainingMs);
