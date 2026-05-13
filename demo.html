@@ -51,14 +51,14 @@
   }
 
   * { box-sizing: border-box; }
- html, body {
-  margin: 0;
-  padding: 0;
-  background: var(--bg);
-  color: var(--text);
-  font-family: Georgia, "Times New Roman", serif;
-  min-height: 100%;
-}
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: Georgia, "Times New Roman", serif;
+    min-height: 100%;
+  }
   button { font-family: inherit; cursor: pointer; }
 
   /* Demo banner */
@@ -75,13 +75,19 @@
     flex-shrink: 0;
   }
 
- #app {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  width: 100%;
-}
-  .main-row { display: flex; flex: 1; min-height: 0; }
+  #app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100%;
+    overflow: hidden;
+  }
+  .main-row {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+  }
 
   /* Sidebar */
   .sidebar {
@@ -103,13 +109,19 @@
     margin-bottom: 22px;
   }
   .brand-mark {
-    width: 36px; height: 36px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--gold), color-mix(in srgb, var(--gold) 70%, black));
-    display: flex; align-items: center; justify-content: center;
-    color: var(--bg);
-    font-size: 15px;
+    width: 48px; height: 48px;
+    border-radius: 6px;
     flex-shrink: 0;
+    overflow: hidden;
+    display: block;
+    box-shadow: 0 0 0 1px var(--gold-line), 0 2px 8px rgba(0,0,0,0.3);
+    background: #000;
+  }
+  .brand-mark img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
   }
   .brand-text-1 {
     font-size: 10px;
@@ -241,7 +253,8 @@
   /* Main */
   .main {
     flex: 1; display: flex; flex-direction: column;
-    min-width: 0; background: var(--bg);
+    min-width: 0; min-height: 0;
+    background: var(--bg);
   }
   .main-header {
     display: flex; align-items: center; justify-content: space-between;
@@ -273,7 +286,12 @@
     text-transform: uppercase;
   }
 
-  .messages-wrap { flex: 1; overflow-y: auto; padding: 24px 0; }
+  .messages-wrap {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 24px 0;
+  }
   .messages-wrap::-webkit-scrollbar { width: 6px; }
   .messages-wrap::-webkit-scrollbar-thumb {
     background: var(--gold-strong); border-radius: 3px;
@@ -337,6 +355,7 @@
     border-radius: 14px;
     padding: 6px 8px 6px 14px;
     display: flex; align-items: flex-end; gap: 10px;
+    position: relative;
   }
   .composer:focus-within { border-color: var(--gold-line); }
   textarea {
@@ -365,6 +384,69 @@
     color: var(--bg);
     cursor: pointer;
   }
+
+  /* Voice input */
+  .mic-btn {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--gold), color-mix(in srgb, var(--gold) 70%, black));
+    border: none;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    color: var(--bg);
+    cursor: pointer;
+    margin-bottom: 4px;
+    transition: filter 0.15s ease, transform 0.1s ease;
+    padding: 0;
+  }
+  .mic-btn:hover { filter: brightness(1.1); }
+  .mic-btn:active { transform: scale(0.95); }
+  .mic-btn svg { width: 22px; height: 22px; display: block; }
+  .mic-btn.recording {
+    background: linear-gradient(135deg, #e57373, #b94a4a);
+    color: var(--bg);
+    animation: pulse-record 1.4s ease-in-out infinite;
+  }
+  .mic-btn.transcribing { cursor: wait; }
+  .mic-btn.transcribing svg { display: none; }
+  .mic-btn.transcribing::after {
+    content: "";
+    width: 14px; height: 14px;
+    border: 2px solid rgba(8, 8, 8, 0.25);
+    border-top-color: #080808;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes pulse-record {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(228, 87, 87, 0.35); }
+    50% { box-shadow: 0 0 0 8px rgba(228, 87, 87, 0); }
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .recording-indicator {
+    position: absolute;
+    top: -30px;
+    right: 14px;
+    background: var(--panel);
+    border: 1px solid var(--gold-line);
+    border-radius: 12px;
+    padding: 4px 10px;
+    font-size: 11px;
+    color: var(--text-dim);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 5;
+  }
+  .recording-indicator .red-dot {
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #e57373;
+    margin-right: 5px;
+    vertical-align: middle;
+    animation: blink 1s ease-in-out infinite;
+  }
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
   .composer-note {
     max-width: 760px; margin: 8px auto 0;
@@ -448,43 +530,54 @@
     .sidebar { width: 220px; padding: 16px 12px; }
     .messages, .composer { padding-left: 16px; padding-right: 16px; }
   }
-@media (max-width: 560px) {
-  .main-row { flex-direction: column; }
-  .sidebar {
-    width: 100%;
-    border-right: none;
-    border-bottom: 1px solid var(--border);
-    padding: 14px 16px;
-    flex-shrink: 0;
-    overflow-y: visible;
+
+  @media (max-width: 560px) {
+    #app {
+      height: auto;
+      min-height: 100vh;
+      overflow: visible;
+    }
+    .main-row {
+      flex-direction: column;
+      overflow: visible;
+    }
+    .main, .messages-wrap { min-height: 0; }
+    .sidebar {
+      width: 100%;
+      border-right: none;
+      border-bottom: 1px solid var(--border);
+      padding: 14px 16px;
+      flex-shrink: 0;
+      overflow-y: visible;
+    }
+    .brand { padding-bottom: 12px; margin-bottom: 12px; }
+    .brand-mark { width: 40px; height: 40px; }
+    .sidebar-label { margin-bottom: 8px; }
+    .day-list { flex-direction: row; gap: 6px; margin-bottom: 12px; overflow-x: auto; }
+    .day-item { flex-shrink: 0; padding: 8px 12px; gap: 8px; }
+    .day-info { display: flex; flex-direction: column; min-width: 0; }
+    .day-title { font-size: 9px; line-height: 1.1; letter-spacing: 0.08em; }
+    .day-theme { font-size: 11px; font-weight: 600; font-style: normal; margin-top: 2px; letter-spacing: 0.02em; }
+    .day-item .day-num { width: 22px; height: 22px; font-size: 10px; }
+    .day-item.active .day-theme { color: var(--gold); }
+    .demo-help { font-size: 10px; padding: 10px; line-height: 1.4; }
+    .reset-btn { margin-top: 10px; padding: 8px; font-size: 10px; }
+    .sidebar-footer { padding-top: 12px; margin-top: 12px; }
+    .main-header { padding: 12px 16px; }
+    .main-header-title { font-size: 13px; }
+    .main-header-sub { font-size: 10px; }
+    .day-chip { display: none; }
+    .messages-wrap { padding: 16px 0; }
+    .messages { padding: 0 16px; gap: 14px; }
+    .msg { font-size: 14px; max-width: 88%; }
+    .composer-wrap { padding: 12px 16px 14px; }
+    .composer-note { font-size: 10px; }
+    .entry-screen { padding: 24px 16px; }
+    .entry-card { padding: 28px 22px; }
+    .entry-title { font-size: 20px; }
+    .entry-sub { font-size: 12px; }
+    textarea, .entry-input { font-size: 16px; }
   }
-  .brand { padding-bottom: 12px; margin-bottom: 12px; }
-  .sidebar-label { margin-bottom: 8px; }
-  .day-list { flex-direction: row; gap: 6px; margin-bottom: 12px; overflow-x: auto; }
-  .day-item { flex-shrink: 0; padding: 8px 12px; gap: 8px; }
-  .day-info { display: flex; flex-direction: column; min-width: 0; }
-  .day-title { font-size: 9px; line-height: 1.1; letter-spacing: 0.08em; }
-  .day-theme { font-size: 11px; font-weight: 600; font-style: normal; margin-top: 2px; letter-spacing: 0.02em; }
-  .day-item .day-num { width: 22px; height: 22px; font-size: 10px; }
-  .day-item.active .day-theme { color: var(--gold); }
-  .demo-help { font-size: 10px; padding: 10px; line-height: 1.4; }
-  .reset-btn { margin-top: 10px; padding: 8px; font-size: 10px; }
-  .sidebar-footer { padding-top: 12px; margin-top: 12px; }
-  .main-header { padding: 12px 16px; }
-  .main-header-title { font-size: 13px; }
-  .main-header-sub { font-size: 10px; }
-  .day-chip { display: none; }
-  .messages-wrap { padding: 16px 0; }
-  .messages { padding: 0 16px; gap: 14px; }
-  .msg { font-size: 14px; max-width: 88%; }
-  .composer-wrap { padding: 12px 16px 14px; }
-  .composer-note { font-size: 10px; }
-  .entry-screen { padding: 24px 16px; }
-  .entry-card { padding: 28px 22px; }
-  .entry-title { font-size: 20px; }
-  .entry-sub { font-size: 12px; }
-  textarea, .entry-input { font-size: 16px; }
-}
 </style>
 </head>
 <body>
@@ -604,7 +697,7 @@
     return `
       <aside class="sidebar">
         <div class="brand">
-          <div class="brand-mark">◇</div>
+          <div class="brand-mark"><img src="https://i.ibb.co/zhrpQVTw/myp-logo.png" alt="Master Your Path" /></div>
           <div>
             <div class="brand-text-1">Master Your Path</div>
             <div class="brand-text-2">Freedom Intelligence Field</div>
@@ -694,6 +787,12 @@
             <div class="composer-wrap">
               <div class="composer">
                 <textarea id="input" rows="1" placeholder="${PLACEHOLDERS[state.currentDay - 1]}"></textarea>
+                <button class="mic-btn" id="mic-btn" type="button" aria-label="Record voice message" title="Record voice message">
+                  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <rect x="9" y="3" width="6" height="11" rx="3"/>
+                    <path d="M19 11a1 1 0 1 0-2 0 5 5 0 0 1-10 0 1 1 0 1 0-2 0 7 7 0 0 0 6 6.93V20H9a1 1 0 1 0 0 2h6a1 1 0 1 0 0-2h-2v-2.07A7 7 0 0 0 19 11z"/>
+                  </svg>
+                </button>
                 <button class="send-btn" id="send-btn" type="button">↑</button>
               </div>
               <div class="composer-note">Demo mode. Conversation history is preserved across day switches.</div>
@@ -705,6 +804,11 @@
       document.getElementById("input").addEventListener("input", onInputChange);
       document.getElementById("input").addEventListener("keydown", onInputKeyDown);
       document.getElementById("send-btn").addEventListener("click", onSendClick);
+      const micBtn = document.getElementById("mic-btn");
+      if (micBtn) {
+        if (!micSupported()) micBtn.style.display = "none";
+        else micBtn.addEventListener("click", onMicClick);
+      }
       setTimeout(() => document.getElementById("input").focus(), 50);
     }
 
@@ -826,8 +930,6 @@
       const data = await apiSetDay(state.sessionToken, day);
       state.currentDay = data.currentDay;
       state.lastCompletedDay = data.lastCompletedDay;
-      // Render the AI's canonical opening for the new day as a real assistant
-      // message. The backend has already persisted it to the database.
       if (data.opening) {
         state.messages.push({
           role: "assistant",
@@ -852,6 +954,155 @@
     state.messages = [];
     state.view = "entry";
     render();
+  }
+
+  // ===== Voice input =====
+  const MAX_RECORDING_MS = 60000;
+  const voiceState = {
+    mediaRecorder: null, audioChunks: [], stream: null, mimeType: "",
+    startedAt: 0, timerInterval: null, autoStopTimer: null, indicatorEl: null
+  };
+
+  function micSupported() {
+    return !!(typeof navigator !== "undefined" && navigator.mediaDevices &&
+      navigator.mediaDevices.getUserMedia && typeof window.MediaRecorder !== "undefined");
+  }
+
+  async function onMicClick() {
+    if (state.loading) return;
+    if (voiceState.mediaRecorder && voiceState.mediaRecorder.state === "recording") {
+      stopRecording();
+      return;
+    }
+    await startRecording();
+  }
+
+  async function startRecording() {
+    const micBtn = document.getElementById("mic-btn");
+    if (!micBtn) return;
+    try {
+      voiceState.stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const candidates = ["audio/webm;codecs=opus","audio/webm","audio/mp4","audio/ogg;codecs=opus"];
+      let mimeType = "";
+      for (const m of candidates) {
+        if (window.MediaRecorder.isTypeSupported && window.MediaRecorder.isTypeSupported(m)) {
+          mimeType = m;
+          break;
+        }
+      }
+      voiceState.mimeType = mimeType || "audio/webm";
+      voiceState.mediaRecorder = mimeType
+        ? new MediaRecorder(voiceState.stream, { mimeType })
+        : new MediaRecorder(voiceState.stream);
+      voiceState.audioChunks = [];
+      voiceState.mediaRecorder.ondataavailable = (e) => {
+        if (e.data && e.data.size > 0) voiceState.audioChunks.push(e.data);
+      };
+      voiceState.mediaRecorder.onstop = async () => {
+        cleanupRecording();
+        micBtn.classList.remove("recording");
+        const blob = new Blob(voiceState.audioChunks, { type: voiceState.mimeType });
+        voiceState.audioChunks = [];
+        if (blob.size < 1000) return;
+        await transcribeBlob(blob, voiceState.mimeType);
+      };
+      voiceState.mediaRecorder.start();
+      voiceState.startedAt = Date.now();
+      micBtn.classList.add("recording");
+      showRecordingIndicator();
+      voiceState.timerInterval = setInterval(updateRecordingIndicator, 250);
+      voiceState.autoStopTimer = setTimeout(() => {
+        if (voiceState.mediaRecorder && voiceState.mediaRecorder.state === "recording") {
+          stopRecording();
+        }
+      }, MAX_RECORDING_MS);
+    } catch (err) {
+      console.error("mic_permission_or_error", err);
+      cleanupRecording();
+      micBtn.classList.remove("recording");
+      alert("Could not access your microphone. Please allow microphone access and try again.");
+    }
+  }
+
+  function stopRecording() {
+    if (voiceState.mediaRecorder && voiceState.mediaRecorder.state === "recording") {
+      voiceState.mediaRecorder.stop();
+    }
+  }
+
+  function cleanupRecording() {
+    if (voiceState.timerInterval) { clearInterval(voiceState.timerInterval); voiceState.timerInterval = null; }
+    if (voiceState.autoStopTimer) { clearTimeout(voiceState.autoStopTimer); voiceState.autoStopTimer = null; }
+    if (voiceState.stream) { voiceState.stream.getTracks().forEach((t) => t.stop()); voiceState.stream = null; }
+    removeRecordingIndicator();
+  }
+
+  function showRecordingIndicator() {
+    const composer = document.querySelector(".composer");
+    if (!composer) return;
+    voiceState.indicatorEl = document.createElement("div");
+    voiceState.indicatorEl.className = "recording-indicator";
+    voiceState.indicatorEl.innerHTML = '<span class="red-dot"></span><span class="rec-time">0:00</span> / 1:00';
+    composer.appendChild(voiceState.indicatorEl);
+  }
+
+  function updateRecordingIndicator() {
+    if (!voiceState.indicatorEl) return;
+    const elapsedMs = Date.now() - voiceState.startedAt;
+    const totalSec = Math.floor(elapsedMs / 1000);
+    const min = Math.floor(totalSec / 60);
+    const sec = totalSec % 60;
+    const timeEl = voiceState.indicatorEl.querySelector(".rec-time");
+    if (timeEl) timeEl.textContent = `${min}:${String(sec).padStart(2, "0")}`;
+  }
+
+  function removeRecordingIndicator() {
+    if (voiceState.indicatorEl) { voiceState.indicatorEl.remove(); voiceState.indicatorEl = null; }
+  }
+
+  function blobToBase64(blob) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const result = reader.result || "";
+        const idx = String(result).indexOf(",");
+        resolve(idx >= 0 ? String(result).slice(idx + 1) : "");
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  }
+
+  async function transcribeBlob(blob, mimeType) {
+    const micBtn = document.getElementById("mic-btn");
+    if (micBtn) micBtn.classList.add("transcribing");
+    try {
+      const audioBase64 = await blobToBase64(blob);
+      const res = await fetch(API_BASE + "/transcribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-session-token": state.sessionToken },
+        body: JSON.stringify({ audioBase64, mimeType })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "transcription_failed");
+      const text = (data.text || "").trim();
+      if (text) {
+        const inputEl = document.getElementById("input");
+        if (inputEl) {
+          const existing = inputEl.value.trim();
+          inputEl.value = existing ? `${existing} ${text}` : text;
+          inputEl.style.height = "auto";
+          inputEl.style.height = Math.min(inputEl.scrollHeight, 200) + "px";
+          inputEl.focus();
+          inputEl.dispatchEvent(new Event("input", { bubbles: true }));
+        }
+      }
+    } catch (err) {
+      console.error("transcribe_failed", err);
+      alert("Could not transcribe your message. Please try again or type instead.");
+    } finally {
+      if (micBtn) micBtn.classList.remove("transcribing");
+    }
   }
 
   async function loadFullState() {
