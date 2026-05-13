@@ -448,6 +448,54 @@
   }
   @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
+  /* Speaker (Shimrit voice playback) */
+  .msg-row.assistant { flex-direction: column; align-items: flex-start; }
+  .speak-btn {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: var(--gold-soft);
+    border: 1px solid var(--gold-line);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    color: var(--gold);
+    cursor: pointer;
+    padding: 0;
+    margin-top: 6px;
+    margin-left: 4px;
+    transition: background 0.15s ease, transform 0.1s ease, border-color 0.15s ease;
+  }
+  .speak-btn:hover { background: rgba(201, 168, 76, 0.18); }
+  .speak-btn:active { transform: scale(0.92); }
+  .speak-btn svg { width: 14px; height: 14px; display: block; }
+  .speak-btn.loading svg { display: none; }
+  .speak-btn.loading::after {
+    content: "";
+    width: 10px; height: 10px;
+    border: 1.5px solid var(--gold-line);
+    border-top-color: var(--gold);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  .speak-btn.playing {
+    background: linear-gradient(135deg, var(--gold), color-mix(in srgb, var(--gold) 70%, black));
+    color: var(--bg);
+    border-color: transparent;
+  }
+  .autoplay-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 4px;
+    margin-top: 6px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.04em;
+    cursor: pointer;
+  }
+  .autoplay-toggle input { margin: 0; accent-color: var(--gold); cursor: pointer; }
+  .autoplay-toggle:hover { color: var(--text); }
+
   .composer-note {
     max-width: 760px; margin: 8px auto 0;
     text-align: center;
@@ -610,7 +658,10 @@
     messages: [],
     loading: false,
     error: null,
-    view: "entry"
+    view: "entry",
+    autoplay: (function () {
+      try { return localStorage.getItem("tfif_autoplay_v1") === "1"; } catch (e) { return false; }
+    })()
   };
 
   // ===== Persistence =====
@@ -697,7 +748,7 @@
     return `
       <aside class="sidebar">
         <div class="brand">
-          <div class="brand-mark"><img src="https://i.ibb.co/zhrpQVTw/myp-logo.png" alt="Master Your Path" /></div>
+          <div class="brand-mark"><img src="https://i.ibb.co/n9hKLzH/Untitled-design-56.png" alt="Master Your Path" /></div>
           <div>
             <div class="brand-text-1">Master Your Path</div>
             <div class="brand-text-2">Freedom Intelligence Field</div>
@@ -725,6 +776,10 @@
 
         ${state.sessionToken ? `<button class="reset-btn" id="reset-btn">Reset conversation</button>` : ""}
 
+        <label class="autoplay-toggle" for="autoplay-checkbox">
+          <input type="checkbox" id="autoplay-checkbox" ${state.autoplay ? "checked" : ""} />
+          Auto-play Shimrit's voice
+        </label>
         <div class="sidebar-footer">
           <div class="footer-text">DEMO v1.0</div>
           <button class="theme-toggle" id="theme-toggle" title="Toggle theme" aria-label="Toggle theme">${themeIcon}</button>
@@ -809,6 +864,8 @@
         if (!micSupported()) micBtn.style.display = "none";
         else micBtn.addEventListener("click", onMicClick);
       }
+      const messagesWrap = document.getElementById("messages-wrap");
+      if (messagesWrap) messagesWrap.addEventListener("click", onSpeakerClick);
       setTimeout(() => document.getElementById("input").focus(), 50);
     }
 
@@ -817,6 +874,8 @@
     if (themeBtn) themeBtn.addEventListener("click", onThemeToggle);
     const resetBtn = document.getElementById("reset-btn");
     if (resetBtn) resetBtn.addEventListener("click", onReset);
+    const autoplayCheckbox = document.getElementById("autoplay-checkbox");
+    if (autoplayCheckbox) autoplayCheckbox.addEventListener("change", onAutoplayChange);
     // Day items only clickable in chat view.
     if (state.view === "chat") {
       document.querySelectorAll(".day-item").forEach(el => {
@@ -828,11 +887,27 @@
   function renderMessages() {
     const wrap = document.getElementById("messages");
     if (!wrap) return;
-    let html = state.messages.map(m => `
-      <div class="msg-row ${m.role}">
-        <div class="msg">${escapeHtml(m.content)}</div>
-      </div>
-    `).join("");
+    let html = state.messages.map((m, i) => {
+      if (m.role === "user") {
+        return `
+          <div class="msg-row ${m.role}">
+            <div class="msg">${escapeHtml(m.content)}</div>
+          </div>
+        `;
+      }
+      return `
+        <div class="msg-row ${m.role}">
+          <div class="msg">${escapeHtml(m.content)}</div>
+          <button class="speak-btn" data-msg-index="${i}" type="button" aria-label="Play in Shimrit's voice" title="Play in Shimrit's voice">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M3 9v6h4l5 5V4L7 9H3z"/>
+              <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>
+              <path d="M14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+            </svg>
+          </button>
+        </div>
+      `;
+    }).join("");
     if (state.loading) {
       html += `
         <div class="msg-row assistant">
@@ -877,6 +952,7 @@
       state.currentDay = chatData.currentDay;
       state.loading = false;
       render();
+      maybeAutoplayLastAssistant();
     } catch (err) {
       state.error = err.message || "Could not start.";
       state.loading = false;
@@ -915,6 +991,7 @@
       state.currentDay = data.currentDay;
       state.loading = false;
       render();
+      maybeAutoplayLastAssistant();
     } catch (err) {
       state.messages.push({ role: "assistant", content: "Demo error: " + (err.message || "could not send.") });
       state.loading = false;
@@ -938,6 +1015,7 @@
       }
       state.loading = false;
       render();
+      maybeAutoplayLastAssistant();
     } catch (err) {
       state.messages.push({ role: "assistant", content: "Demo error: " + (err.message || "could not switch day.") });
       state.loading = false;
@@ -1103,6 +1181,106 @@
     } finally {
       if (micBtn) micBtn.classList.remove("transcribing");
     }
+  }
+
+  // ===== Speaker (Shimrit voice playback) =====
+  const speakerState = {
+    currentAudio: null,
+    currentBtnEl: null,
+    currentIndex: -1
+  };
+
+  function setSpeakerBtnState(btnEl, stateName) {
+    if (!btnEl) return;
+    btnEl.classList.remove("loading", "playing");
+    if (stateName === "loading") btnEl.classList.add("loading");
+    else if (stateName === "playing") btnEl.classList.add("playing");
+  }
+
+  function stopCurrentAudio() {
+    if (speakerState.currentAudio) {
+      try { speakerState.currentAudio.pause(); } catch (e) {}
+      try { URL.revokeObjectURL(speakerState.currentAudio.src); } catch (e) {}
+      speakerState.currentAudio = null;
+    }
+    if (speakerState.currentBtnEl) {
+      setSpeakerBtnState(speakerState.currentBtnEl, "idle");
+      speakerState.currentBtnEl = null;
+    }
+    speakerState.currentIndex = -1;
+  }
+
+  async function playMessageAudio(msgIndex, btnEl) {
+    if (speakerState.currentIndex === msgIndex && speakerState.currentAudio) {
+      stopCurrentAudio();
+      return;
+    }
+    stopCurrentAudio();
+
+    const msg = state.messages[msgIndex];
+    if (!msg || msg.role !== "assistant" || !msg.content) return;
+
+    speakerState.currentBtnEl = btnEl;
+    speakerState.currentIndex = msgIndex;
+    setSpeakerBtnState(btnEl, "loading");
+
+    try {
+      const res = await fetch(API_BASE + "/speak", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-session-token": state.sessionToken
+        },
+        body: JSON.stringify({ text: msg.content })
+      });
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || "tts_failed");
+      }
+      const audioBlob = await res.blob();
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audio = new Audio(audioUrl);
+      speakerState.currentAudio = audio;
+      audio.onended = () => {
+        if (speakerState.currentAudio === audio) stopCurrentAudio();
+      };
+      audio.onerror = () => {
+        if (speakerState.currentAudio === audio) stopCurrentAudio();
+      };
+      setSpeakerBtnState(btnEl, "playing");
+      await audio.play();
+    } catch (err) {
+      console.error("speak_failed", err);
+      setSpeakerBtnState(btnEl, "idle");
+      speakerState.currentAudio = null;
+      speakerState.currentBtnEl = null;
+      speakerState.currentIndex = -1;
+    }
+  }
+
+  function onSpeakerClick(e) {
+    const btn = e.target.closest(".speak-btn");
+    if (!btn) return;
+    const idx = parseInt(btn.dataset.msgIndex, 10);
+    if (Number.isNaN(idx)) return;
+    playMessageAudio(idx, btn);
+  }
+
+  function maybeAutoplayLastAssistant() {
+    if (!state.autoplay) return;
+    const lastIdx = state.messages.length - 1;
+    if (lastIdx < 0) return;
+    const last = state.messages[lastIdx];
+    if (!last || last.role !== "assistant") return;
+    setTimeout(() => {
+      const btn = document.querySelector(`.speak-btn[data-msg-index="${lastIdx}"]`);
+      if (btn) playMessageAudio(lastIdx, btn);
+    }, 50);
+  }
+
+  function onAutoplayChange(e) {
+    state.autoplay = !!e.target.checked;
+    try { localStorage.setItem("tfif_autoplay_v1", state.autoplay ? "1" : "0"); } catch (err) {}
   }
 
   async function loadFullState() {
