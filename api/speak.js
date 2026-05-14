@@ -67,16 +67,14 @@ export default async function handler(req, res) {
     }
 
     // ElevenLabs TTS endpoint. Returns audio/mpeg bytes directly.
-    // model_id: eleven_turbo_v2_5 balances quality and latency. For higher
-    // quality but slower generation, use eleven_multilingual_v2.
+    // Using eleven_flash_v2_5: supports 32 languages including Hebrew, low
+    // latency, and works with cloned voices like Shimrit's. Matches our
+    // Whisper auto-detect flow so the AI can answer in any language the
+    // participant speaks and the response is read back in that language.
     const ttsUrl = `https://api.elevenlabs.io/v1/text-to-speech/${encodeURIComponent(voiceId)}`;
-    // Use multilingual v2 so Shimrit's cloned voice can speak any language
-    // the conversation switches into (Whisper auto-detects, the AI continues
-    // in the new language, and TTS follows). Slightly slower than turbo but
-    // necessary for the multi-language flow. ~1s latency increase per call.
     const ttsBody = {
       text: cleanText,
-      model_id: "eleven_multilingual_v2",
+      model_id: "eleven_flash_v2_5",
       voice_settings: {
         stability: 0.5,
         similarity_boost: 0.75,
