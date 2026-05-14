@@ -70,9 +70,13 @@ export default async function handler(req, res) {
     // model_id: eleven_turbo_v2_5 balances quality and latency. For higher
     // quality but slower generation, use eleven_multilingual_v2.
     const ttsUrl = `https://api.elevenlabs.io/v1/text-to-speech/${encodeURIComponent(voiceId)}`;
+    // Use multilingual v2 so Shimrit's cloned voice can speak any language
+    // the conversation switches into (Whisper auto-detects, the AI continues
+    // in the new language, and TTS follows). Slightly slower than turbo but
+    // necessary for the multi-language flow. ~1s latency increase per call.
     const ttsBody = {
       text: cleanText,
-      model_id: "eleven_turbo_v2_5",
+      model_id: "eleven_multilingual_v2",
       voice_settings: {
         stability: 0.5,
         similarity_boost: 0.75,
